@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jacob's Exercise Library</title>
+<meta name="description" content="A browsable library of reformer exercises with spring-load suggestions.">
+<meta name="theme-color" content="#0A0A12">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@200;300;400;500;600;700;800&family=Roboto+Mono:wght@400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root{
+    --bg:#08080F; --surface:#111119; --surface-elev:#18181F;
+    --border:rgba(255,255,255,0.07); --text:#F0EFE8;
+    --text-2:rgba(240,239,232,0.62); --text-3:rgba(240,239,232,0.34);
+    --coral:#FF7B6E; --violet:#9B6DFF; --mint:#5CE6A0; --amber:#FFB347;
+  }
+  body{ background:#0A0A12; font-family:'Roboto',system-ui,sans-serif; color:var(--text); min-height:100vh; padding:0 0 100px; -webkit-font-smoothing:antialiased; }
+  .wrap{ max-width:1280px; margin:0 auto; padding:0 32px; }
+
+  /* Header */
+  header{ padding:56px 0 28px; }
+  .eyebrow{ font-size:11px; font-weight:800; letter-spacing:0.22em; text-transform:uppercase;
+    background:linear-gradient(135deg,var(--coral),var(--violet)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  h1{ font-size:40px; font-weight:800; letter-spacing:-0.02em; margin:10px 0 12px; }
+  .sub{ color:var(--text-2); font-size:15px; max-width:640px; line-height:1.55; }
+  .sub b{ color:var(--text); font-weight:600; }
+
+  /* Toolbar */
+  .toolbar{ position:sticky; top:0; z-index:20; background:rgba(10,10,18,0.86); backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--border); padding:16px 0; margin-bottom:32px; }
+  .toolbar .wrap{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  .search{ position:relative; flex:1; min-width:220px; }
+  .search .material-icons{ position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--text-3); font-size:20px; }
+  .search input{ width:100%; background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    color:var(--text); font-family:inherit; font-size:14px; padding:12px 14px 12px 42px; outline:none; transition:border-color .15s; }
+  .search input:focus{ border-color:rgba(155,109,255,0.5); }
+  .search input::placeholder{ color:var(--text-3); }
+  .chips{ display:flex; gap:8px; flex-wrap:wrap; }
+  .chip{ background:var(--surface); border:1px solid var(--border); color:var(--text-2);
+    padding:9px 15px; border-radius:99px; font-size:13px; font-weight:600; cursor:pointer; transition:all .15s; white-space:nowrap; }
+  .chip:hover{ color:var(--text); border-color:rgba(255,255,255,0.16); }
+  .chip.active{ background:rgba(155,109,255,0.16); border-color:rgba(155,109,255,0.5); color:#C9B6FF; }
+  .chip .cnt{ opacity:0.6; font-weight:500; margin-left:5px; font-family:'Roboto Mono',monospace; font-size:11px; }
+  .count{ color:var(--text-3); font-size:13px; font-family:'Roboto Mono',monospace; white-space:nowrap; }
+
+  /* Grid */
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; }
+  .card{ background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:20px; display:flex; flex-direction:column; gap:12px; transition:border-color .15s, transform .15s; }
+  .card:hover{ border-color:rgba(255,255,255,0.14); transform:translateY(-2px); }
+  .card-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+  .card h3{ font-size:16px; font-weight:700; line-height:1.3; letter-spacing:-0.01em; }
+  .tag{ font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:4px 9px; border-radius:99px; white-space:nowrap; flex-shrink:0; }
+  .tag.core{ background:rgba(92,230,160,0.14); color:var(--mint); }
+  .tag.lower{ background:rgba(255,123,110,0.14); color:var(--coral); }
+  .tag.oblique{ background:rgba(255,179,71,0.16); color:var(--amber); }
+  .tag.upper{ background:rgba(155,109,255,0.18); color:#C9B6FF; }
+
+  .springs{ display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+  .springs .lbl{ font-size:11px; color:var(--text-3); text-transform:uppercase; letter-spacing:0.1em; font-weight:600; margin-right:2px; }
+  .pill{ display:inline-flex; align-items:center; gap:6px; padding:5px 11px; border-radius:8px; font-size:12.5px; font-weight:600; font-family:'Roboto Mono',monospace; }
+  .pill .dot{ width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+  .pill.gray{ background:rgba(154,160,170,0.13); color:#C3C8D0; } .pill.gray .dot{ background:#9AA0AA; }
+  .pill.black{ background:rgba(255,255,255,0.05); color:#D6D6DE; border:1px solid rgba(255,255,255,0.13); } .pill.black .dot{ background:#15151b; border:1px solid rgba(255,255,255,0.35); }
+  .pill.blue{ background:rgba(90,150,255,0.15); color:#9CC0FF; } .pill.blue .dot{ background:#5A96FF; }
+  .pill.white{ background:rgba(240,239,232,0.09); color:#EDEDE6; } .pill.white .dot{ background:#F0EFE8; }
+  .pill .note{ font-family:'Roboto',sans-serif; font-weight:500; opacity:0.7; font-size:11px; }
+  .pill.none{ background:transparent; color:var(--text-3); border:1px dashed var(--border); font-family:'Roboto',sans-serif; }
+
+  .setup{ color:var(--text-2); font-size:13px; line-height:1.5; }
+  .card-foot{ display:flex; align-items:center; gap:14px; color:var(--text-3); font-size:12px; margin-top:2px; padding-top:12px; border-top:1px solid var(--border); }
+  .card-foot span{ display:inline-flex; align-items:center; gap:5px; font-family:'Roboto Mono',monospace; }
+  .card-foot .material-icons{ font-family:'Material Icons'; font-size:15px; }
+
+  .empty{ text-align:center; color:var(--text-3); padding:80px 0; font-size:15px; }
+  .empty .material-icons{ font-size:44px; display:block; margin-bottom:12px; opacity:0.5; }
+
+  .legend{ display:flex; gap:18px; flex-wrap:wrap; margin-top:14px; color:var(--text-3); font-size:12px; align-items:center; }
+  .legend .item{ display:inline-flex; align-items:center; gap:6px; }
+  .legend .dot{ width:10px; height:10px; border-radius:50%; }
+  @media(max-width:720px){
+    .wrap{ padding:0 16px; }
+    header{ padding:32px 0 18px; }
+    h1{ font-size:27px; }
+    .sub{ font-size:14px; }
+    .legend{ gap:12px 16px; font-size:11.5px; }
+    /* toolbar stacks: search on top, chips scroll sideways below */
+    .toolbar{ padding:12px 0; margin-bottom:22px; }
+    .toolbar .wrap{ flex-direction:column; align-items:stretch; gap:12px; }
+    .search{ min-width:0; width:100%; }
+    .search input{ font-size:16px; padding:13px 14px 13px 42px; }  /* 16px avoids iOS zoom-on-focus */
+    .chips{ flex-wrap:nowrap; overflow-x:auto; gap:8px; margin:0 -16px; padding:2px 16px 4px;
+      -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+    .chips::-webkit-scrollbar{ display:none; }
+    .chip{ padding:10px 16px; font-size:13.5px; flex-shrink:0; }
+    .count{ display:none; }
+    /* single-column cards, tighter */
+    .grid{ grid-template-columns:1fr; gap:12px; }
+    .card{ padding:16px; }
+    .card h3{ font-size:15.5px; }
+  }
+  @media(max-width:380px){ h1{ font-size:24px; } }
+</style>
+</head>
+<body>
+  <header><div class="wrap">
+    <div class="eyebrow">Reformer · Library</div>
+    <h1>Jacob's Exercise Library</h1>
+    <p class="sub">Every unique move pulled from the <b>Level 2 — Lower Templates</b> workbook, deduplicated across all class variations. Spring loads shown are the <b>Winter Park</b> settings (Gray / Black / Blue). Tap a category or search to filter.</p>
+    <div class="legend">
+      <span class="item"><span class="dot" style="background:#9AA0AA"></span>Gray · lightest</span>
+      <span class="item"><span class="dot" style="background:#15151b;border:1px solid rgba(255,255,255,.35)"></span>Black · heavier</span>
+      <span class="item"><span class="dot" style="background:#5A96FF"></span>Blue · heaviest</span>
+      <span class="item" style="color:var(--text-3)">Multiple pills = stack both springs</span>
+    </div>
+  </div></header>
+
+  <div class="toolbar"><div class="wrap">
+    <div class="search"><span class="material-icons">search</span>
+      <input id="q" type="text" placeholder="Search moves, e.g. lunge, plank, curl…" autocomplete="off">
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="count" id="count"></div>
+  </div></div>
+
+  <div class="wrap"><div class="grid" id="grid"></div>
+    <div class="empty" id="empty" style="display:none"><span class="material-icons">search_off</span>No moves match that search.</div>
+  </div>
+
+<script>
+const DATA = [{"name": "Ab Roller", "category": "Core", "wp": "1 Gray", "setup": "Front, Facing Front", "time": "40 sec - 1 min", "n": 4}, {"name": "Army Crawl", "category": "Core", "wp": "1 Gray", "setup": "Front, Facing Back", "time": "1 Min - 90 Sec", "n": 1}, {"name": "Bear", "category": "Core", "wp": "1 Gray", "setup": "Front, Facing back", "time": "1 Mintue", "n": 3}, {"name": "Bear Climber", "category": "Core", "wp": "1 Gray", "setup": "Front, Facing front", "time": "1 minute", "n": 1}, {"name": "Bear Kicks", "category": "Core", "wp": "1 Gray", "setup": "Front, Facing back, bear hold alternating raising legs", "time": "40 Sec - 1 Min", "n": 1}, {"name": "Bungee Crunch", "category": "Core", "wp": "3 Black", "setup": "front facing front", "time": "1 min", "n": 2}, {"name": "Carve Crunch", "category": "Core", "wp": "1 Gray", "setup": "Sitting on back platform, Facing front", "time": "40 sec - 1 Min", "n": 2}, {"name": "Cobra", "category": "Core", "wp": "", "setup": "front facing front", "time": "1 min", "n": 1}, {"name": "Flying Saw", "category": "Core", "wp": "1 Gray", "setup": "Front, Facing Back", "time": "1 Min - 90 Sec", "n": 1}, {"name": "Forearm Plank to Pike", "category": "Core", "wp": "", "setup": "front facing front", "time": "1 min", "n": 1}, {"name": "Forearm Strap Crunch", "category": "Core", "wp": "1 Gray, 1 Black", "setup": "Seated on carriage, facing back", "time": "1.5 minutes", "n": 1}, {"name": "High Bar Bear", "category": "Core", "wp": "1 Gray", "setup": "Front, Facing front", "time": "1 Minute w/ Pulse", "n": 1}, {"name": "High Bar Pike", "category": "Core", "wp": "1 Gray", "setup": "Front, Facing front", "time": "40 Sec - 1 Min", "n": 1}, {"name": "High Plank", "category": "Core", "wp": "1 Gray", "setup": "Front, Facing back", "time": "1 Minute w/ Pulse", "n": 1}, {"name": "High Plank Hold", "category": "Core", "wp": "1 Gray", "setup": "Front, Facing back", "time": "1 Minute", "n": 3}, {"name": "King Bear", "category": "Core", "wp": "1 Gray", "setup": "Back, Facing Back", "time": "40 sec - 1 min", "n": 1}, {"name": "King Crunch", "category": "Core", "wp": "1 Gray", "setup": "Back, Facing Back", "time": "40 sec - 1 min", "n": 3}, {"name": "King Pike", "category": "Core", "wp": "1 Gray", "setup": "Back, facing back", "time": "1 minute", "n": 1}, {"name": "King Saw", "category": "Core", "wp": "1 Gray", "setup": "Back, facing back", "time": "1 minute", "n": 1}, {"name": "Kneeling Crunch", "category": "Core", "wp": "1 Gray", "setup": "Front, facing front", "time": "1 minute", "n": 1}, {"name": "Kneeling Saw", "category": "Core", "wp": "1 Gray", "setup": "Front, Facing Back", "time": "40 sec - 1 min", "n": 5}, {"name": "Pike", "category": "Core", "wp": "1 Gray", "setup": "Front, Facing front", "time": "1 minute", "n": 2}, {"name": "Plank to Pike", "category": "Core", "wp": "1 Gray", "setup": "Front, Facing back", "time": "1 Minute w/ Pulse", "n": 1}, {"name": "Platform Lunge Bicep Curl with Bungee", "category": "Core", "wp": "", "setup": "front facing front curl the bungee with right hand. left foot is on platform", "time": "2 min", "n": 1}, {"name": "Reverse King Bear", "category": "Core", "wp": "1 Gray", "setup": "Back, facing front", "time": "1.5 minutes", "n": 1}, {"name": "Reverse King Saw", "category": "Core", "wp": "1 Gray", "setup": "Back, Facing front", "time": "1 Minute w/ Pulse", "n": 2}, {"name": "Reverse King Twisted Crunch", "category": "Core", "wp": "1 Gray", "setup": "Back, Facing front", "time": "1 Minute w/ Pulse", "n": 1}, {"name": "Rolling Ball Crunch", "category": "Core", "wp": "1 Gray, 1 Black", "setup": "Seated on carriage, facing back", "time": "1.5 minutes", "n": 1}, {"name": "S Crunch", "category": "Core", "wp": "", "setup": "Feet under front platform strap, facing front, bodyweight crunches", "time": "1 Minute", "n": 1}, {"name": "Single Arm Balance Serve the Platter", "category": "Core", "wp": "", "setup": "", "time": "1.5 min", "n": 1}, {"name": "Single Arm Balance Shoulder Press", "category": "Core", "wp": "", "setup": "", "time": "1.5 min", "n": 1}, {"name": "Single Arm Tricep Kickback", "category": "Core", "wp": "", "setup": "", "time": "1.5 min", "n": 1}, {"name": "Straight Arm Lift", "category": "Core", "wp": "1 Gray, 1 Black", "setup": "Seated on carriage, facing back", "time": "1.5 minutes", "n": 1}, {"name": "Back Floor Lunge", "category": "Lower Body", "wp": "1 Gray", "setup": "Right leg in front of back platform on ground; Left Foot in carriage pocket", "time": "2 Minutes", "n": 1}, {"name": "Ball Reverse Hypertensions", "category": "Lower Body", "wp": "3 Black (stabilization)", "setup": "Lying on stomach, ball OR ring  between ankles", "time": "1 minute", "n": 1}, {"name": "Bungee Hamstring Curl", "category": "Lower Body", "wp": "1 Gray, 1 Black", "setup": "Table top, bungee around foot", "time": "1.5 minutes", "n": 1}, {"name": "Bungee Kick", "category": "Lower Body", "wp": "3 Black", "setup": "Left Leg 90 degree bend in knee", "time": "2 minutes", "n": 1}, {"name": "Bungee Leg Extension", "category": "Lower Body", "wp": "1 Gray, 1 Black", "setup": "Lying on back, bungee around foot", "time": "1.5 minutes", "n": 1}, {"name": "Carriage Ball Leg Press", "category": "Lower Body", "wp": "3 Black", "setup": "Seated on carriage, face front", "time": "1.5 minutes", "n": 1}, {"name": "Carriage Donkey Kick", "category": "Lower Body", "wp": "1 Gray, 1 Black", "setup": "Table top on carriage, strap around thigh. Cable goes in between arms!", "time": "2.5 minutes", "n": 1}, {"name": "Carve Lunge", "category": "Lower Body", "wp": "1 Gray", "setup": "Back, facing back", "time": "2 minutes", "n": 1}, {"name": "Carve Split Squat", "category": "Lower Body", "wp": "1 Gray", "setup": "standing behind the back platform working for on the ground, nonworking toe on the back platform ￼", "time": "2 minutes", "n": 1}, {"name": "Clam Shell", "category": "Lower Body", "wp": "1 Gray, 1 Black", "setup": "Lying on side, strap around side", "time": "1.5  minutes", "n": 1}, {"name": "Cross Kickstand Deadlift", "category": "Lower Body", "wp": "1 Gray, 1 Black", "setup": "Right foot on back platform, right side, red cable in left hand ￼", "time": "2 minutes", "n": 1}, {"name": "Diagonal Cursty Sweep", "category": "Lower Body", "wp": "1 Gray, 1 Black", "setup": "Tabletop on carriage, diagonal, strap on right foot", "time": "90 Seconds", "n": 1}, {"name": "Diagonal Curtsy Kick", "category": "Lower Body", "wp": "1 Gray, 1 Black", "setup": "Tabletop on carriage, diagonal, strap on right foot", "time": "90 Seconds", "n": 1}, {"name": "Donkey Kick", "category": "Lower Body", "wp": "3 Black", "setup": "High bar turned out, Left foot on high bar, tabletop position on carriage", "time": "2 Minutes", "n": 1}, {"name": "Fire Hydrant", "category": "Lower Body", "wp": "1 Gray, 1 Black", "setup": "Strap around thigh, table top", "time": "2 minutes", "n": 1}, {"name": "Front Floor Lunge", "category": "Lower Body", "wp": "3 Black", "setup": "Standing in front of front platform", "time": "2 minutes", "n": 1}, {"name": "Good Mornings", "category": "Lower Body", "wp": "3 Black", "setup": "Bilateral Legs- Carriage stays open", "time": "2 minutes", "n": 1}, {"name": "Inner Thigh and Kneeling Squats", "category": "Lower Body", "wp": "1 Gray", "setup": "One knee on back platform, one knee on carriage", "time": "2-2.5 Minutes w/ Pulse", "n": 1}, {"name": "King Hamstring Curl", "category": "Lower Body", "wp": "1 Gray", "setup": "Feet on carriage", "time": "1.5 minutes", "n": 2}, {"name": "King Lateral Lunge", "category": "Lower Body", "wp": "1 Gray", "setup": "Right Leg on back platform, facing back", "time": "2-2.5 Minutes", "n": 1}, {"name": "Kneeling Squat Serve the Platter", "category": "Lower Body", "wp": "1 Gray, 1 Black", "setup": "Kneeling on carriage, holding black handles", "time": "1.5 minutes", "n": 1}, {"name": "Leg Press", "category": "Lower Body", "wp": "1 Gray, 3 Black", "setup": "￼ sitting on front platform, feet on carriage bar", "time": "1.5 minutes", "n": 1}, {"name": "Light Lateral Lunge", "category": "Lower Body", "wp": "1 Gray", "setup": "Right foot on front platform, left toes carriage", "time": "2.5 minutes", "n": 1}, {"name": "Light Squats", "category": "Lower Body", "wp": "1 Gray", "setup": "", "time": "2 minutes", "n": 1}, {"name": "Lying Froggy Kick", "category": "Lower Body", "wp": "1 Gray, 1 Black", "setup": "Lying on carriage, foot in strap, leg kick towards front", "time": "2 minutes", "n": 1}, {"name": "Lying Leg Extension", "category": "Lower Body", "wp": "1 Gray, 1 Black", "setup": "Lying on back, handles on feet", "time": "2 minutes", "n": 1}, {"name": "Lying Leg Raise to Frog Press", "category": "Lower Body", "wp": "1 Gray, 1 Black", "setup": "Lying in back, feet in straps", "time": "2 minutes", "n": 1}, {"name": "Lying Leg Sweep", "category": "Lower Body", "wp": "1 Gray, 1 Black", "setup": "Lying on side, strap around foot", "time": "2 minutes", "n": 1}, {"name": "Outer Thigh and Good Mornings", "category": "Lower Body", "wp": "3 Black", "setup": "Pivot to the left, bilateral movement, shift weight evenly between legs", "time": "2-2.5 Minutes w/ Pulse", "n": 1}, {"name": "Platform Lunge", "category": "Lower Body", "wp": "1 Gray", "setup": "Left foot on front platform, Right foot on carriage", "time": "2 Minutes", "n": 1}, {"name": "Red Cable Carriage Ham Curl", "category": "Lower Body", "wp": "2 Gray", "setup": "Table top, facing front , red strap around foot", "time": "1 minutes", "n": 1}, {"name": "Red Cable Carriage Kickback", "category": "Lower Body", "wp": "2 Gray", "setup": "Table top, facing front , red strap around foot", "time": "1.5 minutes", "n": 1}, {"name": "Red Cable Clam Shell Thrust", "category": "Lower Body", "wp": "2 Gray", "setup": "Modified side plank, cable around ankle", "time": "1.5 minutes", "n": 1}, {"name": "Red Cable Staggered RDL", "category": "Lower Body", "wp": "2 Gray", "setup": "Standing on side of carriage on right foot, cable in left hand", "time": "2 minutes", "n": 1}, {"name": "Reverse Single Leg Press", "category": "Lower Body", "wp": "3 Black", "setup": "Seated on carriage, face front", "time": "1.5 minutes", "n": 1}, {"name": "Ring Glute Bridge", "category": "Lower Body", "wp": "3 Black", "setup": "Lying on carriage, ring in between inner thighs", "time": "2.5 minutes", "n": 1}, {"name": "Runners Lunge", "category": "Lower Body", "wp": "3 Black", "setup": "Front, Facing Front", "time": "2 Minutes", "n": 3}, {"name": "Scooter Kick", "category": "Lower Body", "wp": "3 Black", "setup": "Tabletop on carriage, High bar turned in, Right foot on high bar, toes pointing down to carriage", "time": "2 Minutes", "n": 1}, {"name": "Seated Leg Press", "category": "Lower Body", "wp": "1 Blue", "setup": "Sitting on front platform, Facing back, Right foot on bar of carriage", "time": "2 Minutes", "n": 1}, {"name": "Seated Strap Adduction", "category": "Lower Body", "wp": "1 Gray, 1 Black", "setup": "Seated on carriage, strap is around the thigh, closest to the back platform", "time": "1.5 minutes", "n": 1}, {"name": "Side Spider", "category": "Lower Body", "wp": "1 Black", "setup": "Centered between platforms; Left Leg on ground", "time": "2 Minutes", "n": 1}, {"name": "Single Leg Bridge", "category": "Lower Body", "wp": "3 Black", "setup": "Lying on back, non working leg in air", "time": "1.5 minutes", "n": 1}, {"name": "Single Leg Deadlift", "category": "Lower Body", "wp": "3 Black", "setup": "Front, Facing Front", "time": "2-2.5 Minutes", "n": 2}, {"name": "Single Leg Platform Bridge", "category": "Lower Body", "wp": "3 Black", "setup": "Foot in front platform, lying on carriage", "time": "1.5 minutes", "n": 1}, {"name": "Spider Kick", "category": "Lower Body", "wp": "1 Blue++", "setup": "Hands on front high bars, Right heel in outer back pocket", "time": "2-2.5 Minutes w/ Pulse", "n": 1}, {"name": "Standing Abduction", "category": "Lower Body", "wp": "1-3 Gray", "setup": "Standing on floor, red strap around calf", "time": "1.5 minutes", "n": 1}, {"name": "Standing Inner Thigh", "category": "Lower Body", "wp": "1 Gray", "setup": "Bilateral", "time": "2 minutes", "n": 3}, {"name": "Standing Kickback", "category": "Lower Body", "wp": "1-3 Gray", "setup": "Standing on floor, red strap around foot", "time": "1.5 minutes", "n": 1}, {"name": "Standing Outer Thigh", "category": "Lower Body", "wp": "3 Black", "setup": "Bilateral", "time": "15-30 seconds", "n": 1}, {"name": "Strap Split Squat", "category": "Lower Body", "wp": "1 Gray, 1 Black", "setup": "Standing on ground, strap around thigh", "time": "1.5 minutes", "n": 1}, {"name": "Strap Squat", "category": "Lower Body", "wp": "1 Gray, 1 Black", "setup": "Standing on ground, strap around thigh", "time": "1.5 minutes", "n": 1}, {"name": "Weighted Squats", "category": "Lower Body", "wp": "3 Black", "setup": "Standing on back platform, red handles", "time": "2-2.5 Minutes", "n": 1}, {"name": "Well Hip Thrust", "category": "Lower Body", "wp": "1 Gray", "setup": "Feet in well", "time": "1 minute", "n": 1}, {"name": "Well Kick", "category": "Lower Body", "wp": "1 Gray, 1 Black", "setup": "Standing in well, foot on carriage bar", "time": "2 'minutes", "n": 1}, {"name": "Well Lunge", "category": "Lower Body", "wp": "1 Gray", "setup": "Standing in well", "time": "2.5 minutes", "n": 1}, {"name": "Carriage Mermaid", "category": "Oblique", "wp": "3 Black", "setup": "Seated on edge of carriage, foot in well", "time": "1.5 minutes", "n": 1}, {"name": "Dancing Bear", "category": "Oblique", "wp": "1 Gray", "setup": "Alt. left and right", "time": "1 minute", "n": 1}, {"name": "French Twist", "category": "Oblique", "wp": "1 Gray", "setup": "Front, Facing front", "time": "1 Minute", "n": 3}, {"name": "King French Twist", "category": "Oblique", "wp": "1 Gray", "setup": "Back, facing back", "time": "1.5 minutes", "n": 1}, {"name": "King Inner Thigh, Torso Twist", "category": "Oblique", "wp": "1 Gray", "setup": "Right knee on platform, left knee on carriage, twist towards right", "time": "1 minutes", "n": 1}, {"name": "King Side Plank", "category": "Oblique", "wp": "1 Gray", "setup": "Back, Facing Back", "time": "90 Seconds", "n": 2}, {"name": "King Twisted Ab Roller", "category": "Oblique", "wp": "1 Gray", "setup": "Back, Facing back", "time": "1 Minute", "n": 1}, {"name": "King Twisted Bear", "category": "Oblique", "wp": "1 Gray", "setup": "Back, Facing back", "time": "1 Minute", "n": 1}, {"name": "King Twisted Crunch", "category": "Oblique", "wp": "1 Gray", "setup": "Back, Facing back", "time": "1 Minute", "n": 1}, {"name": "King Twisted Kneeling Crunch", "category": "Oblique", "wp": "1 Gray", "setup": "Back, Facing Back", "time": "90 Seconds", "n": 1}, {"name": "Kneeling Woodchop", "category": "Oblique", "wp": "1 Black, 1 Gray", "setup": "Left Oblique facing front platform", "time": "1 Minute", "n": 1}, {"name": "Mermaid", "category": "Oblique", "wp": "", "setup": "Sitting on back platform, Left Foot crossed in front", "time": "1 Minute", "n": 1}, {"name": "Oblique Sweep", "category": "Oblique", "wp": "1 Gray, 1 Black", "setup": "Tabletop on carriage, Right foot in strap", "time": "90 Seconds", "n": 1}, {"name": "Red Cable Bird Dog", "category": "Oblique", "wp": "2 Gray", "setup": "Table top facing back", "time": "1.5 minutes", "n": 1}, {"name": "Red Cable Side Crunch", "category": "Oblique", "wp": "2 Gray", "setup": "Lying on side, red strap around ankle", "time": "1 minute", "n": 1}, {"name": "Reverse King Crunch", "category": "Oblique", "wp": "1 Gray", "setup": "Back, facing front", "time": "1.5 minutes", "n": 1}, {"name": "Reverse King Side Plank", "category": "Oblique", "wp": "1 Gray", "setup": "Back, Facing front", "time": "1 Minute", "n": 2}, {"name": "Reverse King Twisted Saw", "category": "Oblique", "wp": "1 Gray", "setup": "Back, Facing front", "time": "1 Minute", "n": 1}, {"name": "Side Plank", "category": "Oblique", "wp": "1 Gray", "setup": "Left forearm down on front platform", "time": "1 minute", "n": 2}, {"name": "Standing Torso Twist", "category": "Oblique", "wp": "1 Gray, 1 Black", "setup": "Standing on ground, facing carriage", "time": "1.5 minute s", "n": 1}, {"name": "Tailbone Torso Twist", "category": "Oblique", "wp": "2 Gray", "setup": "Seated on carriage facing side, hold BLACK cable", "time": "1.5 minutes", "n": 1}, {"name": "Twisted Ab Roller", "category": "Oblique", "wp": "1 Gray", "setup": "Front, facing back", "time": "1 minute", "n": 1}, {"name": "Twisted Bear", "category": "Oblique", "wp": "1 Gray", "setup": "Front, Facing front", "time": "1 Minute", "n": 1}, {"name": "Twisted Crunch", "category": "Oblique", "wp": "1 Gray", "setup": "Front, Facing Front", "time": "1 minute", "n": 2}, {"name": "Balance Tricep Kickback", "category": "Upper Body", "wp": "1 Black, 1 Gray", "setup": "Kneeling on carriage, Left strap in hand, Right leg extended", "time": "1 min - 90 sec", "n": 1}, {"name": "Bicep Curl", "category": "Upper Body", "wp": "1 Black, 1 Gray", "setup": "Bilateral on carriage facing back", "time": "1 Min - 90 sec", "n": 1}, {"name": "Chest Fly", "category": "Upper Body", "wp": "1 Black, 1 Gray", "setup": "Kneeling on carriage facing front", "time": "1 Minute", "n": 1}, {"name": "Front Raises", "category": "Upper Body", "wp": "1 Black", "setup": "Standing behind platform; Facing front", "time": "1 Min - 90 sec", "n": 1}, {"name": "Incline Chest Fly", "category": "Upper Body", "wp": "1 Black - 1 Black, 1 Gray", "setup": "Sit down on ground in front of back platform use red handles", "time": "1.5 min with holds and half range", "n": 1}, {"name": "Kneeling Lat Pull", "category": "Upper Body", "wp": "1 Gray, 1 Black", "setup": "Kneeling on back platform, pulling carriage bar", "time": "90 Seconds", "n": 1}, {"name": "Kneeling Pushups", "category": "Upper Body", "wp": "1 Gray", "setup": "front facing back, set up like ab roller", "time": "1 min", "n": 1}, {"name": "Kneeling Serve the Platter", "category": "Upper Body", "wp": "1 Black", "setup": "kneeling on back platform; Facing front", "time": "1 Min - 90 sec", "n": 1}, {"name": "Lat Pull on High Bars", "category": "Upper Body", "wp": "1 Gray, 1 Black", "setup": "Front, Facing back", "time": "1-1.5 min with holds and half range", "n": 1}, {"name": "Lat Pulls", "category": "Upper Body", "wp": "1 Black, 1 Gray", "setup": "Knees to back carriage strap; kneeling; pulling high handle bars", "time": "1 Min - 90 sec", "n": 1}, {"name": "Newspaper", "category": "Upper Body", "wp": "1 Black, 1 Gray", "setup": "High kneeling on carriage", "time": "1 min - 90 sec", "n": 1}, {"name": "Overhead Tricep Extension", "category": "Upper Body", "wp": "1 Black, 1 Gray", "setup": "Kneeling on carriage facing front", "time": "1 Minute", "n": 1}, {"name": "Reverse Fly with Black Handles", "category": "Upper Body", "wp": "1 Gray, 1 Black", "setup": "on carriage", "time": "1-1.5 min", "n": 1}, {"name": "Serve the Platter", "category": "Upper Body", "wp": "1 Black, 1 Gray", "setup": "Kneeling on carriage facing front", "time": "1 Minute", "n": 1}, {"name": "Single Arm Glute Bridge Chest Press", "category": "Upper Body", "wp": "1 Black - 1 Black, 1 Gray", "setup": "Neck and back on back platform in glute bridge position", "time": "1.5 min with holds and half range", "n": 1}, {"name": "Single Arm Row", "category": "Upper Body", "wp": "1 Black - 1 Black, 1 Gray", "setup": "standing on back platform using red handle hinged forward", "time": "1.5 min with holds and half range", "n": 1}, {"name": "Single Arm Swimmer", "category": "Upper Body", "wp": "1 Black", "setup": "Table top facing back pressing black handle back", "time": "1 min - 90 sec", "n": 1}, {"name": "Squat to Row", "category": "Upper Body", "wp": "1 Gray, 1 Black", "setup": "Standing behind back platform with red handles", "time": "90 Seconds", "n": 1}, {"name": "Standing Chest Opener", "category": "Upper Body", "wp": "1 Black", "setup": "Standing behind back platform; Facing Front", "time": "1 Min - 90 sec", "n": 1}, {"name": "Suitcase Squat", "category": "Upper Body", "wp": "1 Black - 1 Black, 1 Gray", "setup": "standing on back platform using red handle", "time": "2 min", "n": 1}, {"name": "Tricep Kickback", "category": "Upper Body", "wp": "1 Gray, 1 Black", "setup": "Both black handles in hand, kneeling on carriage, facing back", "time": "90 Seconds", "n": 1}, {"name": "Tricep Kickbacks", "category": "Upper Body", "wp": "1 Black, 1 Gray", "setup": "Bilateral on carriage facing back", "time": "1 Min - 90 sec", "n": 1}];
+const CATS = ['All','Core','Lower Body','Oblique','Upper Body'];
+const catClass = {'Core':'core','Lower Body':'lower','Oblique':'oblique','Upper Body':'upper'};
+let active='All', query='';
+
+function springPills(wp){
+  if(!wp) return '<span class="pill none">Bodyweight</span>';
+  return wp.split(',').map(seg=>{
+    seg=seg.trim(); if(!seg) return '';
+    let color='white';
+    if(/gray|grey/i.test(seg)) color='gray';
+    else if(/black/i.test(seg)) color='black';
+    else if(/blue/i.test(seg)) color='blue';
+    else if(/white/i.test(seg)) color='white';
+    // split count+color from trailing note e.g. "(stabilization)" or "++"
+    let m = seg.match(/^([\d\-]+\s*(?:gray|grey|black|blue|white))\s*(.*)$/i);
+    let main = m? m[1] : seg, note = m? m[2] : '';
+    return `<span class="pill ${color}"><span class="dot"></span>${main}${note?` <span class="note">${note}</span>`:''}</span>`;
+  }).join('');
+}
+function render(){
+  const chips=document.getElementById('chips');
+  chips.innerHTML=CATS.map(c=>{
+    const n = c==='All'?DATA.length:DATA.filter(x=>x.category===c).length;
+    return `<div class="chip ${c===active?'active':''}" data-c="${c}">${c}<span class="cnt">${n}</span></div>`;
+  }).join('');
+  chips.querySelectorAll('.chip').forEach(el=>el.onclick=()=>{active=el.dataset.c; render();});
+
+  let rows=DATA.filter(x=>(active==='All'||x.category===active) &&
+    (!query || x.name.toLowerCase().includes(query) || (x.setup||'').toLowerCase().includes(query)));
+  document.getElementById('count').textContent=`${rows.length} move${rows.length!==1?'s':''}`;
+  document.getElementById('empty').style.display=rows.length?'none':'block';
+  document.getElementById('grid').innerHTML=rows.map(x=>`
+    <div class="card">
+      <div class="card-top">
+        <h3>${x.name}</h3>
+        <span class="tag ${catClass[x.category]||'upper'}">${x.category}</span>
+      </div>
+      <div class="springs"><span class="lbl">Spring</span>${springPills(x.wp)}</div>
+      ${x.setup?`<div class="setup">${x.setup}</div>`:''}
+      <div class="card-foot">
+        ${x.time?`<span><span class="material-icons">schedule</span>${x.time}</span>`:''}
+        <span><span class="material-icons">fitness_center</span>${x.n} class${x.n!==1?'es':''}</span>
+      </div>
+    </div>`).join('');
+}
+document.getElementById('q').addEventListener('input',e=>{query=e.target.value.trim().toLowerCase(); render();});
+render();
+</script>
+</body>
+</html>
