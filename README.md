@@ -28,4 +28,7 @@ Each entry looks like:
 
 ## Source
 
-Moves were extracted and deduplicated from the *Level 2 — Lower Templates* class workbook.
+Moves were extracted and deduplicated from the class-template workbooks — the *Level 2 — Lower
+Templates* set plus the July/August 2026 templates (Level 1 & 2, the August daily Slow-Twitch
+programming, and Upper Focus). Where a move's Winter Park spring wasn't listed, the Maguire load
+is shown as a fallback.
